@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>🎄 Ruleta del Intercambio</title>
+
+<style>
+  body {
+    background: radial-gradient(circle, #071c3f, #020b1d);
+    font-family: Arial, sans-serif;
+    color: #fff;
+    text-align: center;
+    padding-top: 30px;
+  }
+
+  h1 {
+    margin-bottom: 10px;
+  }
+
+  input {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    width: 200px;
+  }
+
+  button {
+    margin-top: 15px;
+    padding: 12px 30px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    background: #e63946;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #ff5c6d;
+  }
+
+  #ruleta-container {
+    margin: 40px auto;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    border: 8px solid gold;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #ruleta {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: conic-gradient(
+      #ffadad,
+      #ffd6a5,
+      #fdffb6,
+      #caffbf,
+      #9bf6ff,
+      #a0c4ff,
+      #bdb2ff
+    );
+    transition: transform 4s cubic-bezier(0.2, 0.6, 0.2, 1);
+  }
+
+  #ruleta span {
+    position: absolute;
+    font-size: 15px;
+    font-weight: bold;
+    color: #111;
+  }
+
+  #flecha {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 36px;
+    color: gold;
+    z-index: 99;
+  }
+
+  #resultado {
+    margin-top: 20px;
+    font-size: 28px;
+    color: gold;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎄 Ruleta del Intercambio</h1>
+
+<p>Escribe tu nombre:</p>
+<input id="usuario" placeholder="Tu nombre">
+<br>
+<button onclick="girar()">GIRAR 🎯</button>
+
+<div id="ruleta-container">
+  <div id="flecha">⬇</div>
+  <div id="ruleta"></div>
+</div>
+
+<h2 id="resultado"></h2>
+
+<script>
+let participantes = [
+  "Alan",
+  "Aguazul",
+  "Angie",
+  "Emma",
+  "Liliana",
+  "Misael",
+  "Santi"
+];
+
+const ruleta = document.getElementById("ruleta");
+
+// Colocar nombres en círculo
+function pintarNombres() {
+  ruleta.innerHTML = "";
+  let total = participantes.length;
+
+  participantes.forEach((nombre, i) => {
+    const span = document.createElement("span");
+    let angulo = (360 / total) * i;
+
+    span.innerText = nombre;
+    span.style.transform =
+      `rotate(${angulo}deg) translate(85px) rotate(-${angulo}deg)`;
+
+    ruleta.appendChild(span);
+  });
+}
+
+pintarNombres();
+
+function girar() {
+  const usuario = document.getElementById("usuario").value.trim();
+
+  if (!usuario) {
+    alert("Escribe tu nombre");
+    return;
+  }
+
+  // Excluir al usuario
+  let disponibles = participantes.filter(p => 
+    p.toLowerCase() !== usuario.toLowerCase()
+  );
+
+  if (disponibles.length === 0) {
+    document.getElementById("resultado").innerText =
+      "❌ Ya no quedan nombres disponibles";
+    return;
+  }
+
+  // Elegir ganador
+  let elegido = disponibles[Math.floor(Math.random() * disponibles.length)];
+  let index = participantes.indexOf(elegido);
+
+  // Calcular rotación
+  let gradosPorSlot = 360 / participantes.length;
+  let giro = 360 * 5 + (360 - index * gradosPorSlot);
+
+  // Animación
+  ruleta.style.transform = `rotate(${giro}deg)`;
+
+  // Mostrar resultado
+  setTimeout(() => {
+    document.getElementById("resultado").innerText =
+      `🎁 Te tocó: ${elegido}`;
+
+    // Eliminar elegido
+    participantes = participantes.filter(p => p !== elegido);
+
+    // Reset ruleta
+    ruleta.style.transition = "none";
+    ruleta.style.transform = "rotate(0deg)";
+    setTimeout(() => {
+      ruleta.style.transition =
+        "transform 4s cubic-bezier(0.2, 0.6, 0.2, 1)";
+      pintarNombres();
+    }, 50);
+
+  }, 4000);
+}
+</script>
+
+</body>
+</html>
